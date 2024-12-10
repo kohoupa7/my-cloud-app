@@ -1,0 +1,23 @@
+steps:
+  # Sestavení Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/$REPO_NAME', '.']
+  
+  # Nahrání image do Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME']
+  
+  # Nasazení na Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'deploy'
+    - '$REPO_NAME'
+    - '--image'
+    - 'gcr.io/$PROJECT_ID/$REPO_NAME'
+    - '--region'
+    - 'europe-west1'
+    - '--platform'
+    - 'managed'
+    - '--allow-unauthenticated'  # Povolí přístup bez autentizace
